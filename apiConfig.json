@@ -1,4 +1,4 @@
-// {
-//   "tenant": "https://<your_tenant_id>.live.dynatrace.com/",
-//   "token": "<api_token>"
-// }
+{
+  "tenant": "https://<your_tenant_id>.live.dynatrace.com/",
+  "token": "<api_token>"
+}
