@@ -43,12 +43,17 @@ Additional route examples will be provided over time.
 ### Dependencies
 ---
 [Dynatrace API Client](https://www.npmjs.com/package/@dt-esa/dynatrace-api-client). Special thanks to [Andrew Knackstedt](https://github.com/knackstedt)
+
 [json2csv](https://www.npmjs.com/package/json2csv) for CSV attachments
+
 [Express](http://expressjs.com/) for handling routes
 
 ### Authors
 ---
 ##### [Samuel Bernardy](https://github.com/samuelbernardy)
+
 [linkedin](https://www.linkedin.com/in/samuelbernardy/)
+
 [Dynatrace One](https://www.dynatrace.com/services-support/dynatrace-one/)
+
 ##### [Andrew Knackstedt](https://github.com/knackstedt)
