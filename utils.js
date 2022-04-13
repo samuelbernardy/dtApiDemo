@@ -24,7 +24,7 @@ const dtAPI = new DynatraceTenantAPI(
 function getDetailsForEachMonitor(entityId) {
   return new Promise((resolve, reject) => {
     dtAPI.v1.synthetic.getMonitor(entityId).then((data) => {
-      //console.log("Got details for this monitor \n\n", data);
+      console.log("Got details for this monitor \n\n", data);
       resolve(data);
     });
   });
@@ -88,5 +88,22 @@ module.exports = {
   // -----------  END  SYNTHETICS EXPORT MODULES ----------- //
 
   // -----------  START  TEST EXPORT MODULES ----------- //
+
+  testToken: function () {
+    return new Promise((resolve, reject) => {
+      data = {
+        token: apiConfig.token,
+      };
+      dtAPI.v2.apiTokens
+        .lookupApiToken(data)
+        .then((info) => {
+          resolve(info);
+        })
+        .catch((e) => {
+          resolve(e);
+        });
+    });
+  },
+
   // TODO: WRITE TEST FUNCTIONS
 };

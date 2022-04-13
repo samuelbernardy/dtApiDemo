@@ -1,13 +1,13 @@
 {
-  "name": "auto_demo",
+  "name": "Dynatrace REST API Worker",
   "version": "1.0.1",
-  "description": "Basic node-express API handler example. For use with Dynatrace API automation workflows. For use by authorized Dynatrace API users. This app is not serviced by Dynatrace, LLC.",
+  "description": "Basic express server for handling Dynatrace API requests. This app is not serviced by Dynatrace, LLC.",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Samuel Bernardy",
+  "author": "Samuel Benjamin Bernardy",
   "license": "ISC",
   "dependencies": {
     "@dt-esa/dynatrace-api-client": "latest",
