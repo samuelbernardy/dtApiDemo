@@ -15,10 +15,13 @@ const {
 //EXPORT SYNTHETIC DETAIL CSV
 app.get("/exportMonitorsDetail", (req, res) => {
   let params = [];
+
   for (const [key, value] of Object.entries(req.query)) {
     params.push({ label: `${key}`, value: `${value}` });
   }
+
   isParams = params.length > 0;
+
   if (!isParams) {
     res.send(
       "declare columns and datasource in the query parameters. Example can be found here: https://github.com/samuelbernardy/dtApiDemo/blob/master/readme.md#exportmonitorsdetail"
@@ -30,7 +33,6 @@ app.get("/exportMonitorsDetail", (req, res) => {
       })
       .then((detailsIterable) => {
         Promise.all(detailsIterable).then((data) => {
-          console.log(data);
           downloadResource(
             res,
             "syntheticMonitors" + Date.now() + ".csv",
@@ -44,6 +46,7 @@ app.get("/exportMonitorsDetail", (req, res) => {
 
 //TEST SERVER
 app.get("/", (req, res) => {
+  console.log("testing express server");
   res.send(
     "Your server is up and running. Try using /testclient to check your DT REST API client connection"
   );
@@ -51,13 +54,25 @@ app.get("/", (req, res) => {
 
 //TEST API
 app.get("/testclient", (req, res) => {
+  console.log("testing api token and connectivity");
+
   testToken().then((data) => {
-    if (data.scopes && data.scopes.length > 0 && data.enabled)
+    if (data.scopes && data.scopes.length > 0 && data.enabled) {
+      console.log(
+        "API CONNECTION SUCCESSFUL: " + JSON.stringify(data, null, 2)
+      );
       res.send("API CONNECTION SUCCESSFUL: " + JSON.stringify(data, null, 2));
-    if (data.status && data.status == 404)
+    }
+
+    if (data.status && data.status == 404) {
+      console.log("TOKEN INVALID: " + data.message);
       res.send("TOKEN INVALID: " + data.message);
-    if (data.status && data.status !== 404 && data.message)
+    }
+
+    if (data.status && data.status !== 404 && data.message) {
+      console.log("API ACCESS PROBLEM: " + data.message);
       res.send("API ACCESS PROBLEM: " + data.message);
+    }
   });
 });
 

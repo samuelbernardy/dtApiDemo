@@ -5,12 +5,7 @@ const { DynatraceTenantAPI } = require("@dt-esa/dynatrace-api-client");
 const { application } = require("express");
 // import csv handler
 const { Parser } = require("json2csv");
-// import configs
-// add related config file...
-// {
-//   token: "DT REST API TOKEN",
-//   tenant: "DT REST API ENDPOINT"
-// }
+// build api client
 const apiConfig = require("./apiConfig.json");
 const dtAPI = new DynatraceTenantAPI(
   {
@@ -22,9 +17,9 @@ const dtAPI = new DynatraceTenantAPI(
 
 //GET ALL DETAILS
 function getDetailsForEachMonitor(entityId) {
+  console.log("getting details for " + entityId);
   return new Promise((resolve, reject) => {
     dtAPI.v1.synthetic.getMonitor(entityId).then((data) => {
-      console.log("Got details for this monitor \n\n", data);
       resolve(data);
     });
   });
@@ -35,15 +30,18 @@ module.exports = {
 
   // INIT DOWNLOAD
   downloadResource: function (res, fileName, fields, data) {
+    console.log("generating csv " + fileName);
     const json2csv = new Parser({ fields });
     const csv = json2csv.parse(data);
     res.header("Content-Type", "text/csv");
     res.attachment(fileName);
+    console.log("sending attachment");
     return res.send(csv);
   },
 
   //GET MONITORS
   getListOfMonitorIds: function () {
+    console.log("getting list of monitors");
     return new Promise((resolve, reject) => {
       dtAPI.v1.synthetic.getMonitorsCollection().then((data) => {
         const map = data.monitors.map((entity) => entity.entityId);
@@ -54,6 +52,7 @@ module.exports = {
 
   //CREATE PROMISE ARRAY
   buildIterable: function (list) {
+    console.log("building promise array");
     let detailCalls = [];
     list.forEach((entityId) => {
       detailCalls.push(getDetailsForEachMonitor(entityId));
@@ -63,6 +62,7 @@ module.exports = {
 
   //REFORMAT TAG FIELDS
   monitorTagFormat: function (obj) {
+    console.log("pivoting tags object");
     obj
       // Filter out all entitys that have no tags
       .filter((entity) => entity.tags && entity.tags.length > 0)
