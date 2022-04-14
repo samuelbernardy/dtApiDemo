@@ -20,7 +20,7 @@ Test server at _/_
 Following message indicates server is receiving requests at specified ports
 
 ```sh
-"Your server is up and running. Try using /testAPI to check your DT REST API client connection"
+"Your server is up and running. Try using /testclient to check your DT REST API client connection"
 ```
 
 Test API client at _/testclient_
