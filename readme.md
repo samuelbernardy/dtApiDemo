@@ -27,13 +27,13 @@ Test API client at _/testclient_
 Following message indidicates successful client configuration and provides details about active token
 
 ```sh
-API CONNECTION SUCCESSFUL: {details}
+"API CONNECTION SUCCESSFUL: {details}"
 ```
 
 If the active token is expired or is not valid, the appropriate message from DT API will be returned. For example:
 
 ```sh
-TOKEN INVALID: Token does not exist
+"TOKEN INVALID: Token does not exist"
 ```
 
 In this case, ensure the DT API CLIENT is [configured as required](https://github.com/Dynatrace-ESA/dynatrace-api-client#readme)
