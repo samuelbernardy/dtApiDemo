@@ -67,10 +67,11 @@ _/upgradeMZs_ is provided as an example use case, creating a batch of management
 To test this, please add a file named "testMZs.json" to the root of the package including an array of target MZs. Then replace the following line in app.js (99 / 100). IF THIS IS NOT DONE, THIS WILL ITERATE THROUGH ALL MANAGEMENT ZONES IN TENANT
 
 ```sh
-      // Filter data by Synthetic entity
-      // USE FOLLOWING FOR LIMITED TESTING
-      // const filtered = filterMZ(testData);
-      const filtered = filterMZ(testData);
+    18    //const testData = require("./testMzs.json");
+    97    // Filter data by Synthetic entity
+    98    // USE FOLLOWING FOR LIMITED TESTING
+    99    // const filtered = filterMZ(testData);
+    100   const filtered = filterMZ(testData);
 ```
 
 ---
