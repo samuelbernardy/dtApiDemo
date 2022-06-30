@@ -15,7 +15,7 @@ const {
   filterMZ,
   createMZ,
 } = require("./utils.js");
-const testData = require("./testMzs.json");
+//const testData = require("./testMzs.json");
 //EXPORT SYNTHETIC DETAIL CSV
 app.get("/exportMonitorsDetail", (req, res) => {
   let params = [];
