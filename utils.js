@@ -14,7 +14,6 @@ const dtAPI = new DynatraceTenantAPI(
   },
   false
 );
-
 //GET ALL DETAILS
 function getDetailsForEachMonitor(entityId) {
   console.log("getting details for " + entityId);
@@ -24,7 +23,27 @@ function getDetailsForEachMonitor(entityId) {
     });
   });
 }
-
+//GET DETAILS FOR EACH MZ
+function getDetailsForEachMZ(entityId) {
+  console.log("getting details for " + entityId);
+  return new Promise((resolve, reject) => {
+    dtAPI.config.managementZones.getManagementZone(entityId).then((data) => {
+      resolve(data);
+    });
+  });
+}
+//GET Executions for each monitor
+function getExecutionsForEachMonitor(entityId, resultType) {
+  console.log("getting executions details for " + entityId);
+  return new Promise((resolve, reject) => {
+    dtAPI.v2.synthetic
+      .getExecutionResult(entityId, resultType)
+      .then((data) => {
+        resolve(data);
+      })
+      .catch((e) => resolve(console.log(e)));
+  });
+}
 module.exports = {
   // ----------- START SYNTHETICS EXPORT MODULES ----------- //
 
@@ -38,7 +57,6 @@ module.exports = {
     console.log("sending attachment");
     return res.send(csv);
   },
-
   //GET MONITORS
   getListOfMonitorIds: function () {
     console.log("getting list of monitors");
@@ -49,8 +67,7 @@ module.exports = {
       });
     });
   },
-
-  //CREATE PROMISE ARRAY
+  //CREATE DETAIL PROMISE ARRAY
   buildIterable: function (list) {
     console.log("building promise array");
     let detailCalls = [];
@@ -59,7 +76,6 @@ module.exports = {
     });
     return detailCalls;
   },
-
   //REFORMAT TAG FIELDS
   monitorTagFormat: function (obj) {
     console.log("pivoting tags object");
@@ -87,7 +103,68 @@ module.exports = {
 
   // -----------  END  SYNTHETICS EXPORT MODULES ----------- //
 
-  // -----------  START  TEST EXPORT MODULES ----------- //
+  // -----------  START MZ MGMT MODULES ----------- //
+
+  //GET LIST OF MANAGEMENT ZONES
+  getListOfMZIds: function () {
+    console.log("getting list of management zones");
+    return new Promise((resolve, reject) => {
+      dtAPI.config.managementZones.listManagementZones().then((data) => {
+        const map = data.values.map((entity) => entity.id);
+        resolve(map);
+      });
+    });
+  },
+  //BUILD MZ Data Iterable
+  buildMZIterable: function (list) {
+    console.log("getting list of filtered mz data");
+    let detailCalls = [];
+    list.forEach((entityId) => {
+      // https://www.dynatrace.com/support/help/shortlink/api-config-management-zones-get-all
+      detailCalls.push(getDetailsForEachMZ(entityId));
+    });
+    return detailCalls;
+  },
+  //FILTER MZs
+  filterMZ: function (payload) {
+    console.log("payload\n" + JSON.stringify(payload));
+    // determine types for sub mz creation
+    const types = ["BROWSER_MONITOR", "HTTP_MONITOR"];
+    payload.forEach((mz) => {
+      // remove non-synethtic types
+      newRules = mz.rules.filter(
+        (r) => r.type == types[0] || r.type == types[1]
+      );
+      mz.rules = newRules;
+    });
+    // remove mzs without remaining rules
+    const cleanPayload = payload.filter((mz) => mz.rules.length > 1);
+    console.log("clean payload\n" + JSON.stringify(cleanPayload));
+    return cleanPayload;
+  },
+  //CREATE MZs
+  createMZ: function (filteredMZ) {
+    return new Promise((resolve, reject) => {
+      console.log("this is the filtered payload\n" + filteredMZ);
+      //build new mz
+      let mzFormatted = {
+        metadata: null,
+        id: null,
+        name: "Synthetic_" + filteredMZ.name,
+        description:
+          "Synthetic administration group for MZ: " + filteredMZ.name,
+        rules: filteredMZ.rules,
+        dimensionalRules: filteredMZ.ruldimensionalRuleses,
+        entitySelectorBasedRules: filteredMZ.entitySelectorBasedRules,
+      };
+      // https://www.dynatrace.com/support/help/shortlink/api-config-management-zones-post-mz
+      dtAPI.config.managementZones.createManagementZone(mzFormatted);
+    });
+  },
+
+  // -----------  END MZ MGMT MODULES ----------- //
+
+  // -----------  START TEST EXPORT MODULES ----------- //
 
   testToken: function () {
     return new Promise((resolve, reject) => {
@@ -104,6 +181,13 @@ module.exports = {
         });
     });
   },
-
-  // TODO: WRITE TEST FUNCTIONS
+  //CREATE EXECUTION PROMISE ARRAY
+  buildExecutionIterable: function (list, resultType) {
+    console.log("building execution promise array");
+    let detailCalls = [];
+    list.forEach((entityId) => {
+      detailCalls.push(getExecutionsForEachMonitor(entityId, resultType));
+    });
+    return detailCalls;
+  },
 };

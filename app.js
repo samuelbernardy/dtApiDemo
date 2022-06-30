@@ -2,16 +2,20 @@
 const express = require("express");
 const app = express();
 const port = 3000;
-
 // import utils
 const {
   downloadResource,
   getListOfMonitorIds,
+  getListOfMZIds,
+  buildMZIterable,
   buildIterable,
   monitorTagFormat,
   testToken,
+  buildExecutionIterable,
+  filterMZ,
+  createMZ,
 } = require("./utils.js");
-
+const testData = require("./testMzs.json");
 //EXPORT SYNTHETIC DETAIL CSV
 app.get("/exportMonitorsDetail", (req, res) => {
   let params = [];
@@ -42,6 +46,67 @@ app.get("/exportMonitorsDetail", (req, res) => {
         });
       });
   }
+});
+//EXPORT EXECUTION DETAILS CSV
+app.get("/exportExecutionDetails", (req, res) => {
+  let params = { monitors: [], resultType: "" };
+
+  for (const [key, value] of Object.entries(req.query)) {
+    if (key.indexOf("exec") > -1) {
+      params.monitors.push(`${value}`);
+    } else if (key == "resultType") {
+      params.resultType = `${value}`;
+    }
+  }
+  isParams =
+    params.monitors.length > 0 &&
+    (params.resultType == "SUCCESS" || params.resultType == "FAILED");
+  if (!isParams) {
+    res.send("Parameters must be set.");
+  } else {
+    getListOfMonitorIds()
+      .then((list) => {
+        console.log("oldList", list);
+        let newList = list.filter((entity) => params.monitors.includes(entity));
+        console.log("newList", newList);
+        return buildExecutionIterable(newList);
+      })
+      .then((detailsIterable) => {
+        Promise.all(detailsIterable).then((data) => {
+          console.log("execData", data);
+          downloadResource(
+            res,
+            "syntheticExecutions" + Date.now() + ".csv",
+            null,
+            data
+          );
+        });
+      });
+  }
+});
+
+//UPGRADE MANAGEMENT ZONES TO INCLUDE FOCUS GROUPS
+app.get("/upgradeMZs", (req, res) => {
+  console.log("get list of MZs");
+  // get all mzs
+  getListOfMZIds().then((list) => {
+    // assembling iterable out of get details calls
+    const iterable = buildMZIterable(list);
+    // execute get details calls
+    Promise.all(iterable).then((data) => {
+      // Filter data by Synthetic entity
+      // USE FOLLOWING FOR LIMITED TESTING
+      // const filtered = filterMZ(testData);
+      const filtered = filterMZ(testData);
+      // iterate through mz
+      filtered.forEach((mz) => {
+        //create new mzs
+        createMZ(mz);
+      });
+      // print filtered data payload to browser window
+      res.send(filtered);
+    });
+  });
 });
 
 //TEST SERVER
