@@ -58,6 +58,23 @@ Monitor|Source|App
 HTTP_CHECK-ABCDEFG12345|API|public service
 SYNTHETIC_TEST-GFEDCBA5|GUI|auth website
 
+---
+
+##### upgradeMZs
+
+_/upgradeMZs_ is provided as an example use case, creating a batch of management zones to provide administrative permissioning over particular entities. In this example, we get all management zones, then post copies with latered names, including only their synthetic capable rules. This answers the question "How do I create a management zone just for admins to edit and create synthetics?"
+
+To test this, please add a file named "testMZs.json" to the root of the package including an array of target MZs. Then replace the following line in app.js (99 / 100). IF THIS IS NOT DONE, THIS WILL ITERATE THROUGH ALL MANAGEMENT ZONES IN TENANT
+
+```sh
+      // Filter data by Synthetic entity
+      // USE FOLLOWING FOR LIMITED TESTING
+      // const filtered = filterMZ(testData);
+      const filtered = filterMZ(testData);
+```
+
+---
+
 ### Forthcoming Updates
 
 ---
