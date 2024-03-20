@@ -1,4 +1,5 @@
+
 {
-  "tenant": "<tenant URL>",
-  "token": "<API Token>"
+  "tenant": "",
+  "token": ""
 }
